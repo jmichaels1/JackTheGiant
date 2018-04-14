@@ -25,6 +25,8 @@ public class Gameplay implements Screen {
     private OrthographicCamera mainCamera;
     private Viewport gameViewport;
 
+    private float lastYPosition;
+
     /**
      * Method Constructor
      * @param game
@@ -41,16 +43,22 @@ public class Gameplay implements Screen {
         createBackGrounds();
     }
 
-
+    /**
+     *
+     * @param dt
+     */
     void update(float dt){
 
         moveCamera();
+        checkBackgroundsOutofBounds();
 
     }
 
-
+    /**
+     *
+     */
     private void moveCamera() {
-        mainCamera.position.y -= 1;
+        mainCamera.position.y -= 3;
     }
 
     /**
@@ -63,7 +71,7 @@ public class Gameplay implements Screen {
         for (int i = 0; i < bgs.length; i++) {
             bgs[i] = new Sprite(new Texture("Backgrounds/Game BG.png"));
             bgs[i].setPosition(0, -(i * bgs[i].getHeight()));
-
+            lastYPosition = Math.abs(bgs[i].getY());
         }
 
     }
@@ -75,6 +83,16 @@ public class Gameplay implements Screen {
         for (int i = 0; i < bgs.length; i++) {
             game.getBatch().draw(bgs[i], bgs[i].getX(), bgs[i].getY());
 
+        }
+    }
+
+    void checkBackgroundsOutofBounds(){
+        for (int i=0; i < bgs.length; i++){
+            if ((bgs[i].getY() - bgs[i].getHeight() / 2f - 5) > mainCamera.position.y){
+                float newPosition = bgs[i].getHeight() + lastYPosition;
+                bgs[i].setPosition(0, -newPosition);
+                lastYPosition = Math.abs(newPosition);
+            }
         }
     }
 
