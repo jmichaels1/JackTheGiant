@@ -26,7 +26,7 @@ public class Cloud extends Sprite {
      * @param cloudName
      */
     public Cloud(World world, String cloudName) {
-        super(new Texture("Cloud/" + cloudName + ".png"));
+        super(new Texture("Clouds/" + cloudName + ".png"));
         this.world = world;
         this.cloudName = cloudName;
     }
@@ -39,13 +39,13 @@ public class Cloud extends Sprite {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.StaticBody;
 
-        bodyDef.position.set((getX() + getWidth() / 2) / GameInfo.PPH,
-                (getY() + getHeight() / 2) / GameInfo.PPH);
+        bodyDef.position.set((getX() - 40) / GameInfo.PPH,
+                getY() / GameInfo.PPH);
 
         body = world.createBody(bodyDef);
 
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox((getWidth() / 2) / GameInfo.PPH,
+        shape.setAsBox((getWidth() / 2 - 20) / GameInfo.PPH,
                 (getHeight() / 2) / GameInfo.PPH);
 
         FixtureDef fixtureDef = new FixtureDef();

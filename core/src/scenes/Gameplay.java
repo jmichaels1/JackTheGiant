@@ -7,10 +7,14 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.escoladeltreball.dam2.GameMain;
 
+import clouds.Cloud;
 import helpers.GameInfo;
 
 
@@ -25,7 +29,15 @@ public class Gameplay implements Screen {
     private OrthographicCamera mainCamera;
     private Viewport gameViewport;
 
+    private OrthographicCamera box2Dcamera;
+    private Box2DDebugRenderer debugRenderer;
+
+    private World world;
+
     private float lastYPosition;
+
+    // delete this later this just a tester
+    Cloud c;
 
     /**
      * Method Constructor
@@ -40,6 +52,18 @@ public class Gameplay implements Screen {
         gameViewport = new StretchViewport(GameInfo.WIDTH, GameInfo.HEIGHT,
                 mainCamera);
 
+        box2Dcamera = new OrthographicCamera();
+        box2Dcamera.setToOrtho(false, GameInfo.WIDTH/GameInfo.PPH,
+                GameInfo.HEIGHT/GameInfo.PPH);
+        box2Dcamera.position.set(GameInfo.WIDTH/2f, GameInfo.HEIGHT/2f, 0);
+
+        debugRenderer = new Box2DDebugRenderer();
+
+        world = new World(new Vector2(0, -9.8f), true);
+
+        c = new Cloud(world, "Dark Cloud");
+        c.setSpritePosition(GameInfo.WIDTH/2f, GameInfo.HEIGHT/2f);
+
         createBackGrounds();
     }
 
@@ -49,7 +73,7 @@ public class Gameplay implements Screen {
      */
     void update(float dt){
 
-        moveCamera();
+//        moveCamera();
         checkBackgroundsOutofBounds();
 
     }
@@ -111,13 +135,15 @@ public class Gameplay implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         game.getBatch().begin();
-//        game.getBatch().draw(bg1, bg1.getX(), bg1.getY());
-//        game.getBatch().draw(bg2, bg2.getX(), bg2.getY());
 
         drawBackGround();
 
+        game.getBatch().draw(c, c.getX() - c.getWidth() / 2f,
+                c.getY() - c.getHeight() / 2f);
+
         game.getBatch().end();
 
+        debugRenderer.render(world, box2Dcamera.combined);
 
         game.getBatch().setProjectionMatrix(mainCamera.combined);
         mainCamera.update();
