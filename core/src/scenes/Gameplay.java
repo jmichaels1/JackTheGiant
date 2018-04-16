@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.escoladeltreball.dam2.GameMain;
 
 import clouds.Cloud;
+import clouds.CloudsController;
 import helpers.GameInfo;
 
 
@@ -36,8 +37,8 @@ public class Gameplay implements Screen {
 
     private float lastYPosition;
 
-    // delete this later this just a tester
-    Cloud c;
+    private CloudsController cloudsController;
+
 
     /**
      * Method Constructor
@@ -47,7 +48,7 @@ public class Gameplay implements Screen {
         this.game = game;
 
         mainCamera = new OrthographicCamera(GameInfo.WIDTH, GameInfo.HEIGHT);
-        mainCamera.position.set(GameInfo.WIDTH / 2f, GameInfo.HEIGHT / 2, 0);
+        mainCamera.position.set(GameInfo.WIDTH / 2f, GameInfo.HEIGHT / 2f, 0);
 
         gameViewport = new StretchViewport(GameInfo.WIDTH, GameInfo.HEIGHT,
                 mainCamera);
@@ -55,14 +56,14 @@ public class Gameplay implements Screen {
         box2Dcamera = new OrthographicCamera();
         box2Dcamera.setToOrtho(false, GameInfo.WIDTH/GameInfo.PPH,
                 GameInfo.HEIGHT/GameInfo.PPH);
+
         box2Dcamera.position.set(GameInfo.WIDTH/2f, GameInfo.HEIGHT/2f, 0);
 
         debugRenderer = new Box2DDebugRenderer();
 
         world = new World(new Vector2(0, -9.8f), true);
 
-        c = new Cloud(world, "Dark Cloud");
-        c.setSpritePosition(GameInfo.WIDTH/2f, GameInfo.HEIGHT/2f);
+        cloudsController = new CloudsController(world);
 
         createBackGrounds();
     }
@@ -73,8 +74,10 @@ public class Gameplay implements Screen {
      */
     void update(float dt){
 
-//        moveCamera();
+        moveCamera();
         checkBackgroundsOutofBounds();
+        cloudsController.setCameraY(mainCamera.position.y);
+        cloudsController.createAndArrangeNewClouds();
 
     }
 
@@ -82,7 +85,7 @@ public class Gameplay implements Screen {
      *
      */
     private void moveCamera() {
-        mainCamera.position.y -= 3;
+        mainCamera.position.y -= 1.5;
     }
 
     /**
@@ -138,8 +141,7 @@ public class Gameplay implements Screen {
 
         drawBackGround();
 
-        game.getBatch().draw(c, c.getX() - c.getWidth() / 2f,
-                c.getY() - c.getHeight() / 2f);
+        cloudsController.drawClouds(game.getBatch());
 
         game.getBatch().end();
 

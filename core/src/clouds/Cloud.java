@@ -58,6 +58,7 @@ public class Cloud extends Sprite {
 
 
     public void setSpritePosition(float x, float y){
+        System.out.println("x : " + x + " - y : " + y);
         setPosition(x, y);
         createdBody();
     }
