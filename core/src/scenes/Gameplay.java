@@ -2,6 +2,7 @@ package scenes;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -17,6 +18,7 @@ import com.escoladeltreball.dam2.GameMain;
 import clouds.Cloud;
 import clouds.CloudsController;
 import helpers.GameInfo;
+import player.Player;
 
 
 /**
@@ -39,8 +41,11 @@ public class Gameplay implements Screen {
 
     private CloudsController cloudsController;
 
+    private Player player;
+
 
     /**
+     *
      * Method Constructor
      * @param game
      */
@@ -65,7 +70,19 @@ public class Gameplay implements Screen {
 
         cloudsController = new CloudsController(world);
 
+        player = cloudsController.positionThePlayer(player);
+
         createBackGrounds();
+    }
+
+    void habldeInput(float dt){
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)){
+            player.movePlayer(-2);
+        }else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)){
+            player.movePlayer(2);
+        }
+
     }
 
     /**
@@ -74,7 +91,8 @@ public class Gameplay implements Screen {
      */
     void update(float dt){
 
-        moveCamera();
+        habldeInput(dt);
+//        moveCamera();
         checkBackgroundsOutofBounds();
         cloudsController.setCameraY(mainCamera.position.y);
         cloudsController.createAndArrangeNewClouds();
@@ -143,12 +161,19 @@ public class Gameplay implements Screen {
 
         cloudsController.drawClouds(game.getBatch());
 
+        player.drawPlayer(game.getBatch());
+
         game.getBatch().end();
 
         debugRenderer.render(world, box2Dcamera.combined);
 
         game.getBatch().setProjectionMatrix(mainCamera.combined);
         mainCamera.update();
+
+        player.updatePlayer();
+
+        world.step(Gdx.graphics.getDeltaTime(), 6, 2);
+
     }
 
     @Override

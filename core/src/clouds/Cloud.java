@@ -20,6 +20,8 @@ public class Cloud extends Sprite {
     private Body body;
     private String cloudName;
 
+    private boolean drawLeft;
+
     /**
      * Método Constructor
      * @param world
@@ -29,6 +31,16 @@ public class Cloud extends Sprite {
         super(new Texture("Clouds/" + cloudName + ".png"));
         this.world = world;
         this.cloudName = cloudName;
+    }
+
+    /*** Gettes and Setters ***/
+
+    public boolean getDrawLeft() {
+        return drawLeft;
+    }
+
+    public void setDrawLeft(boolean drawLeft) {
+        this.drawLeft = drawLeft;
     }
 
     /**
