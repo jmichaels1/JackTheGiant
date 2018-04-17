@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import scenes.Gameplay;
+import scenes.MainMenu;
 
 
 public class GameMain extends Game {
@@ -17,17 +18,11 @@ public class GameMain extends Game {
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-//		img = new Texture("Backgrounds/Game BG.png");
-		setScreen(new Gameplay(this));
+		setScreen(new MainMenu(this));
 	}
 
 	@Override
 	public void render () {
-//		Gdx.gl.glClearColor(1, 0, 0, 1);
-//		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-//		batch.begin();
-//		batch.draw(img, 0, 0);
-//		batch.end();
 		super.render();
 	}
 

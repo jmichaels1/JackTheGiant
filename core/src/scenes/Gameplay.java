@@ -76,9 +76,13 @@ public class Gameplay implements Screen {
     void habldeInput(float dt){
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)){
+//            player.setWalking(true);
             player.movePlayer(-2);
         }else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)){
+//            player.setWalking(true);
             player.movePlayer(2);
+        } else {
+            player.setWalking(false);
         }
 
     }

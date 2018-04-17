@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Fixture;
@@ -75,6 +76,15 @@ public class Player extends Sprite {
      * @param x
      */
     public void movePlayer(float x){
+
+        if (x < 0 && !this.isFlipX()) {
+            this.flip(true, false);
+        } else if (x > 0 && this.isFlipX()) {
+            this.flip(true, false);
+        }
+
+
+        isWalking = true;
         body.setLinearVelocity(x, body.getLinearVelocity().y);
     }
 
@@ -98,9 +108,20 @@ public class Player extends Sprite {
 
             elapsedTime += Gdx.graphics.getDeltaTime();
 
+            com.badlogic.gdx.utils.Array<TextureAtlas.AtlasRegion> frames = playerAtlas.getRegions();
+
+            for (TextureRegion frame : frames) {
+                if (body.getLinearVelocity().x < 0 && !frame.isFlipX()) {
+                    frame.flip(true, false);
+                } else if (body.getLinearVelocity().x > 0 && frame.isFlipX()) {
+                    frame.flip(true, false);
+
+                }
+            }
+
             animation = new Animation(1f/10f, playerAtlas.getRegions());
 
-            batch.draw((Texture) animation.getKeyFrame(elapsedTime, true),
+            batch.draw((TextureRegion) animation.getKeyFrame(elapsedTime, true),
                     getX() + getWidth() / 2f - 20 ,
                     getY() - getHeight() / 2f);
         }
@@ -116,7 +137,7 @@ public class Player extends Sprite {
                 body.getPosition().y * GameInfo.PPH);
     }
 
-    public void setWaling(boolean isWalking){
+    public void setWalking(boolean isWalking){
         this.isWalking = isWalking;
     }
 }
