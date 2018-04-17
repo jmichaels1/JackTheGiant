@@ -1,6 +1,5 @@
 package scenes;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -15,7 +14,6 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.escoladeltreball.dam2.GameMain;
 
-import clouds.Cloud;
 import clouds.CloudsController;
 import helpers.GameInfo;
 import player.Player;
@@ -161,7 +159,8 @@ public class Gameplay implements Screen {
 
         cloudsController.drawClouds(game.getBatch());
 
-        player.drawPlayer(game.getBatch());
+        player.drawPlayerIdle(game.getBatch());
+        player.drawPlayerAnimation(game.getBatch());
 
         game.getBatch().end();
 

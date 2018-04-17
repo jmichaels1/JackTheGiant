@@ -1,8 +1,11 @@
 package player;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Fixture;
@@ -20,6 +23,13 @@ public class Player extends Sprite {
     private World world;
     private Body body;
 
+    private TextureAtlas playerAtlas;
+    private Animation animation;
+    private float elapsedTime;
+
+    private boolean isWalking;
+
+
     /**
      * Método Constructor
      * @param world
@@ -29,6 +39,7 @@ public class Player extends Sprite {
         this.world = world;
         setPosition(x,y);
         createBody();
+        playerAtlas = new TextureAtlas("Player Animation/Player Animation.atlas");
     }
 
     /**
@@ -71,11 +82,31 @@ public class Player extends Sprite {
      *
      * @param batch
      */
-    public void drawPlayer(SpriteBatch batch){
-        batch.draw(this, getX() + getWidth() / 2f,
-                getY() - getHeight() / 2f);
+    public void drawPlayerIdle(SpriteBatch batch){
+
+        if (!isWalking){
+
+            batch.draw(this, getX() + getWidth() / 2f - 20,
+                    getY() - getHeight() / 2f);
+
+        }
 
     }
+
+    public void drawPlayerAnimation(SpriteBatch batch){
+        if (isWalking){
+
+            elapsedTime += Gdx.graphics.getDeltaTime();
+
+            animation = new Animation(1f/10f, playerAtlas.getRegions());
+
+            batch.draw((Texture) animation.getKeyFrame(elapsedTime, true),
+                    getX() + getWidth() / 2f - 20 ,
+                    getY() - getHeight() / 2f);
+        }
+    }
+
+
 
     /**
      *
@@ -83,5 +114,9 @@ public class Player extends Sprite {
     public void updatePlayer(){
         setPosition(body.getPosition().x * GameInfo.PPH,
                 body.getPosition().y * GameInfo.PPH);
+    }
+
+    public void setWaling(boolean isWalking){
+        this.isWalking = isWalking;
     }
 }
