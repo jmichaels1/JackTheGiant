@@ -80,19 +80,19 @@ public class MainMenuButtons {
                 GameManager.getInstance().gameStartedFromMainMenu = true;
 
 
-//                RunnableAction run = new RunnableAction();
-//                run.setRunnable(new Runnable() {
-//                    @Override
-//                    public void run() {
+                RunnableAction run = new RunnableAction();
+                run.setRunnable(new Runnable() {
+                    @Override
+                    public void run() {
                         game.setScreen(new Gameplay(game));
-//                    }
-//                });
+                    }
+                });
 //
-//                SequenceAction sa = new SequenceAction();
-//                sa.addAction(Actions.fadeOut(1f));
-//                sa.addAction(run);
-//
-//                stage.addAction(sa);
+                SequenceAction sa = new SequenceAction();
+                sa.addAction(Actions.fadeOut(1f));
+                sa.addAction(run);
+
+                stage.addAction(sa);
 
 
             }
