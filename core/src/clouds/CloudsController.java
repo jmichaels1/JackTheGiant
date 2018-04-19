@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.Array;
 
 import java.util.Random;
 
+import Collectable.Collectable;
 import helpers.GameInfo;
 import player.Player;
 
@@ -25,6 +26,8 @@ public class CloudsController {
     private Random random = new Random();
 
     private float lastCloudPositionY;
+
+    private Array<Collectable> collectables = new Array<Collectable>();
 
 
     /**
@@ -107,6 +110,12 @@ public class CloudsController {
 
         }
 
+        Collectable c1 = new Collectable(world, "Coin");
+        c1.setCollectablePosition(aCloud.get(1).getX(),
+                aCloud.get(1).getY() + 40);
+
+        collectables.add(c1);
+
     }
 
     /**
@@ -133,7 +142,21 @@ public class CloudsController {
     }
 
     /**
-     *
+     * drawCollectables
+     */
+    public void drawCollectables(SpriteBatch batch){
+
+        for (Collectable c :
+                collectables) {
+            c.updateCollectable();
+            batch.draw(c, c.getX(), c.getY());
+        }
+
+    }
+
+
+    /**
+     * createAndArrangeNewClouds
      */
     public void createAndArrangeNewClouds() {
         for (int i = 0; i < aCloud.size; i++) {
@@ -183,5 +206,16 @@ public class CloudsController {
     private float randomBetweenNumber(float min, float max){
 
         return random.nextFloat() * (max - min) + min;
+    }
+
+    public void removeCollectables() {
+        for (int i = 0; i < collectables.size; i++) {
+            if (collectables.get(i).getFixture().getUserData() == "Remove") {
+                collectables.get(i).changeFilter();
+                collectables.get(i).getTexture().dispose();
+                collectables.removeIndex(i);
+            }
+        }
+
     }
 }
