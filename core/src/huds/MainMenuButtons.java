@@ -20,6 +20,7 @@ import com.escoladeltreball.dam2.GameMain;
 import helpers.GameInfo;
 import helpers.GameManager;
 import scenes.Gameplay;
+import scenes.Highscore;
 import scenes.Options;
 
 public class MainMenuButtons {
@@ -101,7 +102,7 @@ public class MainMenuButtons {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
 
-//                game.setScreen(new Highscore(game));
+                game.setScreen(new Highscore(game));
 
             }
         });
@@ -109,7 +110,7 @@ public class MainMenuButtons {
         optionsBtn.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                game.setScreen(new Options(game));
+                game.setScreen(new Gameplay(game));
             }
         });
 
