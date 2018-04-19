@@ -35,11 +35,6 @@ public class Options implements Screen {
 
         btns = new OptionsButtons(game);
 
-
-
-
-
-
     }
 
     @Override

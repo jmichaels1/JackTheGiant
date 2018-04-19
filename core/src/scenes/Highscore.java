@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.escoladeltreball.dam2.GameMain;
 
 import helpers.GameInfo;
+import huds.HighscoreButtons;
 
 /**
  * Created by Michael
@@ -23,7 +24,7 @@ public class Highscore implements Screen {
 
     private Texture bg;
 
-//    private HighscoreButtons btns;
+    private HighscoreButtons btns;
 
     public Highscore(GameMain main) {
         this.game = main;
@@ -36,7 +37,7 @@ public class Highscore implements Screen {
 
         bg = new Texture("Backgrounds/Highscore BG.png");
 
-//        btns = new HighscoreButtons(game);
+        btns = new HighscoreButtons(game);
 
 
 
@@ -59,8 +60,8 @@ public class Highscore implements Screen {
 
         game.getBatch().end();
 
-//        game.getBatch().setProjectionMatrix(btns.getStage().getCamera().combined);
-//        btns.getStage().draw();
+        game.getBatch().setProjectionMatrix(btns.getStage().getCamera().combined);
+        btns.getStage().draw();
 
     }
 

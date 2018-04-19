@@ -20,6 +20,7 @@ public class GameManager {
     private Music music;
 
     private GameManager() {
+
     }
 
     public void initializeGameData(){

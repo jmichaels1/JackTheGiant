@@ -16,6 +16,7 @@ import com.escoladeltreball.dam2.GameMain;
 
 import clouds.CloudsController;
 import helpers.GameInfo;
+import huds.UIHud;
 import player.Player;
 
 
@@ -36,6 +37,8 @@ public class Gameplay implements Screen {
     private World world;
 
     private float lastYPosition;
+
+    private UIHud hud;
 
     private CloudsController cloudsController;
 
@@ -63,6 +66,8 @@ public class Gameplay implements Screen {
         box2Dcamera.position.set(GameInfo.WIDTH/2f, GameInfo.HEIGHT/2f, 0);
 
         debugRenderer = new Box2DDebugRenderer();
+
+        hud = new UIHud(game);
 
         world = new World(new Vector2(0, -9.8f), true);
 
@@ -173,6 +178,9 @@ public class Gameplay implements Screen {
         game.getBatch().setProjectionMatrix(mainCamera.combined);
         mainCamera.update();
 
+        game.getBatch().setProjectionMatrix(hud.getStage().getCamera().combined);
+        hud.getStage().draw();
+
         player.updatePlayer();
 
         world.step(Gdx.graphics.getDeltaTime(), 6, 2);
@@ -181,7 +189,7 @@ public class Gameplay implements Screen {
 
     @Override
     public void resize(int width, int height) {
-
+        gameViewport.update(width, height);
     }
 
     @Override
