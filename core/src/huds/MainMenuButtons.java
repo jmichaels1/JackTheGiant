@@ -77,9 +77,9 @@ public class MainMenuButtons {
         playBtn.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-//                GameManager.getInstance().gameStartedFromMainMenu = true;
-//
-//
+                GameManager.getInstance().gameStartedFromMainMenu = true;
+
+
 //                RunnableAction run = new RunnableAction();
 //                run.setRunnable(new Runnable() {
 //                    @Override
@@ -87,7 +87,7 @@ public class MainMenuButtons {
                         game.setScreen(new Gameplay(game));
 //                    }
 //                });
-
+//
 //                SequenceAction sa = new SequenceAction();
 //                sa.addAction(Actions.fadeOut(1f));
 //                sa.addAction(run);

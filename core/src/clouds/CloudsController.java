@@ -9,6 +9,7 @@ import java.util.Random;
 
 import Collectable.Collectable;
 import helpers.GameInfo;
+import helpers.GameManager;
 import player.Player;
 
 /**
@@ -106,9 +107,39 @@ public class CloudsController {
 
                 lastCloudPositionY = positionY;
 
+                if (!firstTimeArranging && c.getCloudName() != "Dark Cloud") {
+                    int rand = random.nextInt(10);
+
+                    if (rand > 1) {
+                        int randomCollectable = random.nextInt(2);
+
+                        if (randomCollectable == 0) {
+                            //spawn a life if the life count is lower than 2
+
+                            if(GameManager.getInstance().lifeScore < 2){
+                                Collectable collectable = new Collectable(world, "Life");
+                                collectable.setCollectablePosition(c.getX(), c.getY() + 40);
+                                collectables.add(collectable);
+                            }else {
+                                Collectable collectable = new Collectable(world, "Coin");
+                                collectable.setCollectablePosition(c.getX(), c.getY() + 40);
+                                collectables.add(collectable);
+                            }
+
+                        } else {
+                            //spawn a coin
+                            Collectable collectable = new Collectable(world, "Coin");
+                            collectable.setCollectablePosition(c.getX(), c.getY() + 40);
+                            collectables.add(collectable);
+                        }
+                    }
+                }
+
             }
 
         }
+
+
 
         Collectable c1 = new Collectable(world, "Coin");
         c1.setCollectablePosition(aCloud.get(1).getX(),
@@ -190,6 +221,18 @@ public class CloudsController {
 
     /**
      *
+     */
+    public void removeOffScreenCollectables(){
+        for(int i = 0; i < collectables.size; i++){
+            if((collectables.get(i).getY() - GameInfo.HEIGHT / 2f - 15) > cameraY){
+                collectables.get(i).getTexture().dispose();
+                collectables.removeIndex(i);
+            }
+        }
+    }
+
+    /**
+     *
      * @param cameraY
      */
     public void setCameraY(float cameraY){
@@ -217,5 +260,13 @@ public class CloudsController {
             }
         }
 
+    }
+
+    public Player positionPlayer(Player player) {
+
+        player = new Player(world, aCloud.get(0).getX(), aCloud.get(0).getY() + 78);
+
+
+        return player;
     }
 }

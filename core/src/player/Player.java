@@ -57,12 +57,12 @@ public class Player extends Sprite {
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(getX() / GameInfo.PPH, getY() / GameInfo.PPH);
+        bodyDef.position.set(getX() / GameInfo.PPM, getY() / GameInfo.PPM);
         body = world.createBody(bodyDef);
         body.setFixedRotation(true);
 
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox((getWidth() / 2f - 20) / GameInfo.PPH, (getHeight() / 2f) / GameInfo.PPH);
+        shape.setAsBox((getWidth() / 2f - 20) / GameInfo.PPM, (getHeight() / 2f) / GameInfo.PPM);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.density = 0f;
@@ -90,10 +90,10 @@ public class Player extends Sprite {
     public void updatePlayer() {
 
         if(body.getLinearVelocity().x > 0){
-            setPosition(body.getPosition().x * GameInfo.PPH, body.getPosition().y * GameInfo.PPH);
+            setPosition(body.getPosition().x * GameInfo.PPM, body.getPosition().y * GameInfo.PPM);
 
         }else if(body.getLinearVelocity().x < 0 ){
-            setPosition((body.getPosition().x - 0.3f) * GameInfo.PPH, body.getPosition().y * GameInfo.PPH);
+            setPosition((body.getPosition().x - 0.3f) * GameInfo.PPM, body.getPosition().y * GameInfo.PPM);
 
         }
 

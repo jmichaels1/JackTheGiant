@@ -36,74 +36,132 @@ import player.Player;
 public class Gameplay implements Screen, ContactListener{
 
     private GameMain game;
-    private Sprite[] bgs;
 
     private OrthographicCamera mainCamera;
-    private Viewport gameViewport;
+    private Viewport gameViweport;
 
-    private OrthographicCamera box2Dcamera;
+    private OrthographicCamera box2DCamera;
     private Box2DDebugRenderer debugRenderer;
+
 
     private World world;
 
-    private float lastYPosition;
-
     private UIHud hud;
-
     private CloudsController cloudsController;
-
     private Player player;
 
-    private Sound coinSound, lifeSound;
+    private float lastPlayerY;
+
+
+    private Sprite[] bgs;
+    private float lastYPosition;
 
     private float cameraSpeed = 10;
     private float maxSpeed = 10;
     private float acceleration = 10;
 
-    /**
-     *
-     * Method Constructor
-     * @param game
-     */
-    public Gameplay(GameMain game){
-        this.game = game;
+    private boolean touchedForTheFirstTime ;
+
+    private Sound coinSound, lifeSound;
+
+
+    public Gameplay(GameMain main) {
+        this.game = main;
 
         mainCamera = new OrthographicCamera(GameInfo.WIDTH, GameInfo.HEIGHT);
-        mainCamera.position.set(GameInfo.WIDTH / 2f, GameInfo.HEIGHT / 2f, 0);
+        mainCamera.position.set(GameInfo.WIDTH / 2, GameInfo.HEIGHT / 2, 0);
 
-        gameViewport = new StretchViewport(GameInfo.WIDTH, GameInfo.HEIGHT,
-                mainCamera);
+        gameViweport = new StretchViewport(GameInfo.WIDTH, GameInfo.HEIGHT, mainCamera);
 
-        box2Dcamera = new OrthographicCamera();
-        box2Dcamera.setToOrtho(false, GameInfo.WIDTH/GameInfo.PPH,
-                GameInfo.HEIGHT/GameInfo.PPH);
+        box2DCamera = new OrthographicCamera();
+        box2DCamera.setToOrtho(false, GameInfo.WIDTH / GameInfo.PPM, GameInfo.HEIGHT / GameInfo.PPM);
 
-        box2Dcamera.position.set(GameInfo.WIDTH/2f, GameInfo.HEIGHT/2f, 0);
+        box2DCamera.position.set(GameInfo.WIDTH / 2f, GameInfo.HEIGHT / 2f, 0);
 
         debugRenderer = new Box2DDebugRenderer();
 
         hud = new UIHud(game);
 
         world = new World(new Vector2(0, -9.8f), true);
+        world.setContactListener(this);
+
 
         cloudsController = new CloudsController(world);
 
-        player = cloudsController.positionThePlayer(player);
+        player = cloudsController.positionPlayer(player);
 
-        createBackGrounds();
+
+        createBackgrounds();
 
         setCameraSpeed();
-
 
         coinSound = Gdx.audio.newSound(Gdx.files.internal("Sounds/Coin Sound.wav"));
         lifeSound = Gdx.audio.newSound(Gdx.files.internal("Sounds/Life Sound.wav"));
 
     }
 
-    /**
-     *
-     */
-    private void setCameraSpeed() {
+    void handleImput(float dt) {
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+            player.movePlayer(-2);
+        } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+            player.movePlayer(2);
+        } else {
+            player.setWalking(false);
+        }
+    }
+
+    void handleInputAndroid(){
+        if(Gdx.input.isTouched()) {
+            if(Gdx.input.getX() > GameInfo.WIDTH / 2){
+                player.movePlayer(2);
+            }else {
+                player.movePlayer(-2);
+            }
+        }else {
+            player.setWalking(false);
+        }
+    }
+
+    void checkForFirstTouch(){
+        if(!touchedForTheFirstTime){
+            if(Gdx.input.justTouched()){
+                touchedForTheFirstTime = true;
+                GameManager.getInstance().isPaused = false;
+                lastPlayerY = player.getY();
+
+            }
+        }
+    }
+
+    void update(float dt) {
+
+        checkForFirstTouch();
+
+        if(!GameManager.getInstance().isPaused){
+            handleImput(dt);
+            handleInputAndroid();
+            moveCamera(dt);
+            checkBackgroundOutOfBound();
+            cloudsController.setCameraY(mainCamera.position.y);
+            cloudsController.createAndArrangeNewClouds();
+            cloudsController.removeOffScreenCollectables();
+            checkPlayersBounds();
+            countScore();
+        }
+    }
+
+    private void moveCamera(float delta) {
+        mainCamera.position.y -= cameraSpeed * delta;
+
+        cameraSpeed += acceleration * delta;
+
+        if(cameraSpeed > maxSpeed) {
+            cameraSpeed = maxSpeed;
+        }
+
+    }
+
+    void setCameraSpeed() {
         if(GameManager.getInstance().gameData.isEasyDifficulty()){
             cameraSpeed = 80;
             maxSpeed = 100;
@@ -120,46 +178,7 @@ public class Gameplay implements Screen, ContactListener{
         }
     }
 
-    void habldeInput(float dt){
-
-        if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)){
-//            player.setWalking(true);
-            player.movePlayer(-2);
-        }else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)){
-//            player.setWalking(true);
-            player.movePlayer(2);
-        } else {
-            player.setWalking(false);
-        }
-
-    }
-
-    /**
-     *
-     * @param dt
-     */
-    void update(float dt){
-
-        habldeInput(dt);
-//        moveCamera();
-        checkBackgroundsOutofBounds();
-        cloudsController.setCameraY(mainCamera.position.y);
-        cloudsController.createAndArrangeNewClouds();
-
-    }
-
-    /**
-     *
-     */
-    private void moveCamera() {
-        mainCamera.position.y -= 1.5;
-    }
-
-    /**
-     * createBackGrounds()
-     */
-    void createBackGrounds(){
-
+    void createBackgrounds() {
         bgs = new Sprite[3];
 
         for (int i = 0; i < bgs.length; i++) {
@@ -170,19 +189,16 @@ public class Gameplay implements Screen, ContactListener{
 
     }
 
-    /**
-     * drawBackGround()
-     */
-    void drawBackGround(){
+    void drawBackgrounds() {
         for (int i = 0; i < bgs.length; i++) {
             game.getBatch().draw(bgs[i], bgs[i].getX(), bgs[i].getY());
-
         }
     }
 
-    void checkBackgroundsOutofBounds(){
-        for (int i=0; i < bgs.length; i++){
-            if ((bgs[i].getY() - bgs[i].getHeight() / 2f - 5) > mainCamera.position.y){
+    void checkBackgroundOutOfBound() {
+
+        for (int i = 0; i < bgs.length; i++) {
+            if ((bgs[i].getY() - bgs[i].getHeight() / 2f - 5) > mainCamera.position.y) {
                 float newPosition = bgs[i].getHeight() + lastYPosition;
                 bgs[i].setPosition(0, -newPosition);
                 lastYPosition = Math.abs(newPosition);
@@ -190,109 +206,36 @@ public class Gameplay implements Screen, ContactListener{
         }
     }
 
+    void checkPlayersBounds(){
 
-    @Override
-    public void show() {
+        if(player.getY() - GameInfo.HEIGHT / 2f - player.getHeight() / 2F > mainCamera.position.y){
+            if(!player.isDead()){
+                playerDied();
+            }
 
-    }
-
-    @Override
-    public void render(float delta) {
-
-        update(delta);
-
-        Gdx.gl.glClearColor(1, 0, 0, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        game.getBatch().begin();
-
-        drawBackGround();
-
-        cloudsController.drawClouds(game.getBatch());
-        cloudsController.drawCollectables(game.getBatch());
-
-        player.drawPlayerIdle(game.getBatch());
-        player.drawPlayerAnimation(game.getBatch());
-
-        game.getBatch().end();
-
-        debugRenderer.render(world, box2Dcamera.combined);
-
-        game.getBatch().setProjectionMatrix(mainCamera.combined);
-        mainCamera.update();
-
-        game.getBatch().setProjectionMatrix(hud.getStage().getCamera().combined);
-        hud.getStage().draw();
-
-        player.updatePlayer();
-
-        world.step(Gdx.graphics.getDeltaTime(), 6, 2);
-
-    }
-
-    @Override
-    public void resize(int width, int height) {
-        gameViewport.update(width, height);
-    }
-
-    @Override
-    public void pause() {
-
-    }
-
-    @Override
-    public void resume() {
-
-    }
-
-    @Override
-    public void hide() {
-
-    }
-
-    @Override
-    public void dispose() {
-
-    }
-
-    @Override
-    public void beginContact(Contact contact) {
-        Fixture body1, body2;
-
-        if(contact.getFixtureA().getUserData() == "Player"){
-            body1 = contact.getFixtureA();
-            body2 = contact.getFixtureB();
-        }else {
-            body1 = contact.getFixtureB();
-            body2 = contact.getFixtureA();
         }
 
-        if (body1.getUserData() == "Player" && body2.getUserData() == "Coin"){
-            hud.incrementCoins();
-            coinSound.play();
-            body2.setUserData("Remove");
-            cloudsController.removeCollectables();
-            //collided with coin
-        }
-
-        if (body1.getUserData() == "Player" && body2.getUserData() == "Life"){
-            hud.incrementLifes();
-            lifeSound.play();
-            body2.setUserData("Remove");
-            cloudsController.removeCollectables();
-            //collided with life
-        }
-
-        if (body1.getUserData() == "Player" && body2.getUserData() == "Dark Cloud"){
+        if(player.getY() + GameInfo.HEIGHT / 2f + player.getHeight() / 2F < mainCamera.position.y){
             if(!player.isDead()){
                 playerDied();
             }
         }
 
-
+        if(player.getX() - 25 > GameInfo.WIDTH || player.getX() + 60 < 0){
+            if(!player.isDead()){
+                playerDied();
+            }
+        }
     }
 
-    private void playerDied() {
+    void countScore(){
+        if(lastPlayerY > player.getY()){
+            hud.incrementScore(1);
+            lastPlayerY = player.getY();
+        }
+    }
+
+    void playerDied(){
 
         GameManager.getInstance().isPaused = true;
 
@@ -345,6 +288,119 @@ public class Gameplay implements Screen, ContactListener{
             hud.getStage().addAction(sa);
         }
 
+
+
+    }
+
+    @Override
+    public void show() {
+
+    }
+
+    @Override
+    public void render(float delta) {
+
+        update(delta);
+
+        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        game.getBatch().begin();
+
+
+        drawBackgrounds();
+
+        cloudsController.drawClouds(game.getBatch());
+        cloudsController.drawCollectables(game.getBatch());
+
+        player.drawPlayerIdle(game.getBatch());
+        player.drawPlayerAnimation(game.getBatch());
+
+        game.getBatch().end();
+
+        /*debugRenderer.render(world, box2DCamera.combined);*/
+
+
+        game.getBatch().setProjectionMatrix(hud.getStage().getCamera().combined);
+        hud.getStage().draw();
+        hud.getStage().act();
+
+        game.getBatch().setProjectionMatrix(mainCamera.combined);
+        mainCamera.update();
+
+        player.updatePlayer();
+        world.step(Gdx.graphics.getDeltaTime(), 6, 2);
+
+    }
+
+    @Override
+    public void resize(int width, int height) {
+
+        gameViweport.update(width,height);
+
+    }
+
+    @Override
+    public void pause() {
+
+    }
+
+    @Override
+    public void resume() {
+
+    }
+
+    @Override
+    public void hide() {
+
+    }
+
+    @Override
+    public void dispose() {
+        world.dispose();
+        for (int i = 0; i < bgs.length; i++) {
+            bgs[i].getTexture().dispose();
+        }
+        player.getTexture().dispose();
+        debugRenderer.dispose();
+        coinSound.dispose();
+        lifeSound.dispose();
+    }
+
+    @Override
+    public void beginContact(Contact contact) {
+
+        Fixture body1, body2;
+
+        if(contact.getFixtureA().getUserData() == "Player"){
+            body1 = contact.getFixtureA();
+            body2 = contact.getFixtureB();
+        }else {
+            body1 = contact.getFixtureB();
+            body2 = contact.getFixtureA();
+        }
+
+        if (body1.getUserData() == "Player" && body2.getUserData() == "Coin"){
+            hud.incrementCoins();
+            coinSound.play();
+            body2.setUserData("Remove");
+            cloudsController.removeCollectables();
+            //collided with coin
+        }
+
+        if (body1.getUserData() == "Player" && body2.getUserData() == "Life"){
+            hud.incrementLifes();
+            lifeSound.play();
+            body2.setUserData("Remove");
+            cloudsController.removeCollectables();
+            //collided with life
+        }
+
+        if (body1.getUserData() == "Player" && body2.getUserData() == "Dark Cloud"){
+            if(!player.isDead()){
+                playerDied();
+            }
+        }
     }
 
     @Override
